@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Daily Best Bet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: one narrow column like an exchange ladder — today's ranked slate, then the record, then the ledger. */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --ink:#16202b; --muted:#5d6b7a; --line:#d5dce4;
+  --back:#a6d8ff; --back-ink:#0b3b63; --lay:#fac9d4; --lay-ink:#6b1428;
+  --win:#13795b; --win-bg:#dcf2e8; --loss:#b3263a; --loss-bg:#fbe1e5; --pend:#8a5a00; --pend-bg:#fdf0d2;
+  --display:"Barlow Condensed","Arial Narrow",sans-serif; --body:"Barlow",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f151c; --surface:#18212b; --ink:#e6ecf2; --muted:#93a1b0; --line:#2b3744;
+  --back:#2a5f8a; --back-ink:#e3f2ff; --lay:#7a3a49; --lay-ink:#ffe3ea;
+  --win:#5fd3a6; --win-bg:#173a2f; --loss:#ff8a9a; --loss-bg:#43202a; --pend:#f3c46a; --pend-bg:#3d3018; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f151c; --surface:#18212b; --ink:#e6ecf2; --muted:#93a1b0; --line:#2b3744;
+  --back:#2a5f8a; --back-ink:#e3f2ff; --lay:#7a3a49; --lay-ink:#ffe3ea;
+  --win:#5fd3a6; --win-bg:#173a2f; --loss:#ff8a9a; --loss-bg:#43202a; --pend:#f3c46a; --pend-bg:#3d3018; color-scheme:dark}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;padding-inline:16px;padding-block:20px 40px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--display);font-weight:700;font-size:2rem;letter-spacing:.01em;margin:0;text-transform:uppercase}
+.sub{color:var(--muted);font-size:.85rem}
+h2{font-family:var(--display);font-weight:600;font-size:.95rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.window{color:var(--muted);font-size:.85rem;margin:-4px 0 10px}
+
+.slate{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.pick{display:grid;grid-template-columns:2.2rem 1fr auto;gap:2px 12px;padding:12px 14px;border-bottom:1px solid var(--line);align-items:center}
+.pick:last-child{border-bottom:0}
+.rank{font-family:var(--display);font-weight:700;font-size:1.6rem;color:var(--muted);grid-row:1/4;align-self:start;font-variant-numeric:tabular-nums;text-align:center}
+.pick.top .rank{color:var(--ink)}
+.pick.top .who{font-size:1.45rem}
+.who{font-family:var(--display);font-weight:700;font-size:1.25rem;line-height:1.1;min-width:0;text-wrap:balance}
+.ev{color:var(--muted);font-size:.85rem;min-width:0;grid-column:2}
+.why{grid-column:2/4;font-size:.9rem;min-width:0}
+.chip{grid-row:1/3;grid-column:3;border-radius:6px;padding:5px 10px;text-align:center;font-family:var(--display);min-width:72px}
+.chip span{display:block;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase}
+.chip b{display:block;font-size:1.45rem;line-height:1;font-variant-numeric:tabular-nums}
+.chip.back{background:var(--back);color:var(--back-ink)}
+.chip.lay{background:var(--lay);color:var(--lay-ink)}
+.meta{grid-column:2/4;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:.8rem;color:var(--muted)}
+
+.pill{font-family:var(--display);font-weight:600;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;padding:1px 8px;border-radius:999px}
+.won{background:var(--win-bg);color:var(--win)} .lost{background:var(--loss-bg);color:var(--loss)}
+.pending{background:var(--pend-bg);color:var(--pend)} .void{background:var(--line);color:var(--muted)}
+.tag{font-family:var(--display);font-weight:600;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:1px 6px;border-radius:4px}
+.tag.back{background:var(--back);color:var(--back-ink)} .tag.lay{background:var(--lay);color:var(--lay-ink)}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.stat b{display:block;font-family:var(--display);font-size:1.6rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.pos{color:var(--win)} .neg{color:var(--loss)}
+@media (max-width:540px){.stats{grid-template-columns:repeat(2,1fr)}}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px}
+.chart svg{display:block;width:100%;height:140px}
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.75rem;color:var(--muted)}
+td.sel2{white-space:normal;min-width:170px}
+td.num,th.num{text-align:right}
+tr.day td{background:var(--bg);font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:.8rem;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+.empty{color:var(--muted);padding:18px;text-align:center}
+details{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:.88rem}
+summary{cursor:pointer;font-weight:600}
+summary:focus-visible{outline:2px solid var(--back-ink);outline-offset:2px}
+footer{color:var(--muted);font-size:.78rem}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Daily Best Bet</h1>
+    <div class="sub" id="updated">Loading…</div>
+  </header>
+
+  <section>
+    <h2>Today's top 10</h2>
+    <p class="window" id="window"></p>
+    <ol class="slate" id="slate"><li class="empty">Loading today's picks…</li></ol>
+  </section>
+
+  <details>
+    <summary>How back and lay bets are scored</summary>
+    <p><strong>Back</strong> means betting the selection will win. A £10 back bet at 1.60 returns £6 profit if it wins and loses £10 if it doesn't.</p>
+    <p><strong>Lay</strong> means betting the selection will <em>not</em> win, on the exchange. A £10 lay at 4.80 wins £10 if the selection fails to win, and loses £38 (10 × 3.80) if it wins. Lays win more often but cost more when they lose.</p>
+  </details>
+
+  <section>
+    <h2>Record at £<span id="stakeLbl">10</span> level stakes</h2>
+    <div class="stats">
+      <div class="stat"><b id="sPicks">–</b><span>Settled bets</span></div>
+      <div class="stat"><b id="sHit">–</b><span>Hit rate</span></div>
+      <div class="stat"><b id="sProfit">–</b><span>Profit</span></div>
+      <div class="stat"><b id="sTop">–</b><span>No.1 picks hit</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Running profit</h2>
+    <div class="chart"><svg id="chart" viewBox="0 0 600 140" preserveAspectRatio="none" role="img" aria-label="Running profit chart"></svg></div>
+  </section>
+
+  <section>
+    <h2>Every pick</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>Pick</th><th>Bet</th><th class="num">Odds</th><th class="num">Conf.</th><th>Result</th><th class="num">P/L</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>Ten ranked picks posted by 12:00 UK time, covering events from noon until 11:59 the next morning. Odds are Betfair Exchange prices where available; profit shown before exchange commission. For fun among friends, not advice. Please gamble responsibly.</footer>
+</div>
+
+<script>
+const fmtMoney = v => (v<0?'−£':'£') + Math.abs(v).toFixed(2);
+const fmtDate = d => new Date(d+'T12:00:00Z').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+const ukTime = (iso,opts) => { try { return new Date(iso).toLocaleString('en-GB',Object.assign({timeZone:'Europe/London'},opts)); } catch(e){ return ''; } };
+const fmtStart = iso => ukTime(iso,{weekday:'short',hour:'2-digit',minute:'2-digit'}) + ' UK';
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const isLay = p => p.type==='lay';
+const pl = (p, stake) => {
+  if(p.result==='won') return isLay(p) ? stake : stake*(p.odds-1);
+  if(p.result==='lost') return isLay(p) ? -stake*(p.odds-1) : -stake;
+  return 0;
+};
+const betLabel = p => isLay(p) ? 'Lay' : 'Back';
+
+function render(data){
+  const stake = data.stake || 10;
+  document.getElementById('stakeLbl').textContent = stake;
+  document.getElementById('updated').textContent = data.updated ? 'Updated ' + ukTime(data.updated,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+  const picks = (data.picks||[]).slice();
+  const dates = [...new Set(picks.map(p=>p.date))].sort().reverse();
+  const today = dates[0];
+
+  const w = data.window;
+  document.getElementById('window').textContent = w ? `Events from ${ukTime(w.from,{weekday:'short',hour:'2-digit',minute:'2-digit'})} to ${ukTime(w.to,{weekday:'short',hour:'2-digit',minute:'2-digit'})} UK. Ranked by chance of the bet landing.` : '';
+
+  const slate = document.getElementById('slate');
+  const todays = picks.filter(p=>p.date===today).sort((a,b)=>(a.rank||99)-(b.rank||99));
+  slate.innerHTML = todays.length ? todays.map(p=>`
+    <li class="pick${p.rank===1?' top':''}">
+      <div class="rank">${esc(p.rank)}</div>
+      <div class="who">${isLay(p)?'Against ':''}${esc(p.selection)}</div>
+      <div class="chip ${isLay(p)?'lay':'back'}"><span>${betLabel(p)}</span><b>${Number(p.odds).toFixed(2)}</b></div>
+      <div class="ev">${esc(p.event)} · ${esc(p.sport)}</div>
+      <div class="why">${esc(p.reason)}</div>
+      <div class="meta"><span>${esc(fmtStart(p.start))}</span><span>·</span><span>${esc(p.confidence)}% confidence</span><span class="pill ${esc(p.result)}">${esc(p.result)}</span></div>
+    </li>`).join('') : '<li class="empty">No picks yet. The first slate appears at 12:00.</li>';
+
+  const settled = picks.filter(p=>p.result==='won'||p.result==='lost').sort((a,b)=> (a.date+String(a.start)) < (b.date+String(b.start)) ? -1 : 1);
+  const wins = settled.filter(p=>p.result==='won').length;
+  const profit = settled.reduce((s,p)=>s+pl(p,stake),0);
+  document.getElementById('sPicks').textContent = settled.length;
+  document.getElementById('sHit').textContent = settled.length ? Math.round(wins/settled.length*100)+'%' : '–';
+  const pe = document.getElementById('sProfit'); pe.textContent = settled.length ? fmtMoney(profit) : '–';
+  pe.className = profit>0?'pos':profit<0?'neg':'';
+  const tops = settled.filter(p=>p.rank===1);
+  document.getElementById('sTop').textContent = tops.length ? `${tops.filter(p=>p.result==='won').length}/${tops.length}` : '–';
+
+  const svg = document.getElementById('chart');
+  if(!settled.length){ svg.innerHTML = '<text x="300" y="74" text-anchor="middle" fill="var(--muted)" font-size="13">The line starts once the first bets are settled</text>'; }
+  else {
+    let c=0; const pts=[0, ...settled.map(p=>(c+=pl(p,stake)))];
+    const mn=Math.min(0,...pts), mx=Math.max(0,...pts), rng=(mx-mn)||1;
+    const X=i=>10+i*(580/Math.max(1,pts.length-1)), Y=v=>125-(v-mn)/rng*110;
+    const d=pts.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
+    const last=pts[pts.length-1], col=last>=0?'var(--win)':'var(--loss)';
+    svg.innerHTML = `<line x1="10" x2="590" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line)" stroke-dasharray="4 4"/>
+      <path d="${d} L${X(pts.length-1)} ${Y(0)} L10 ${Y(0)} Z" fill="${col}" fill-opacity=".12"/>
+      <path d="${d}" fill="none" stroke="${col}" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
+      <circle cx="${X(pts.length-1)}" cy="${Y(last)}" r="4" fill="${col}"/>`;
+  }
+
+  const tb = document.getElementById('rows');
+  tb.innerHTML = picks.length ? dates.map(d=>{
+    const day = picks.filter(p=>p.date===d).sort((a,b)=>(a.rank||99)-(b.rank||99));
+    const dayPL = day.reduce((s,p)=>s+pl(p,stake),0);
+    const anySettled = day.some(p=>p.result==='won'||p.result==='lost');
+    return `<tr class="day"><td colspan="6">${esc(fmtDate(d))}</td><td class="num ${dayPL>0?'pos':dayPL<0?'neg':''}">${anySettled?fmtMoney(dayPL):''}</td></tr>` +
+      day.map(p=>{ const v=pl(p,stake), s=p.result==='won'||p.result==='lost';
+        return `<tr><td>${esc(p.rank)}</td><td class="sel2"><strong>${esc(p.selection)}</strong><br><span class="sub">${esc(p.event)}</span></td>
+          <td><span class="tag ${isLay(p)?'lay':'back'}">${betLabel(p)}</span></td>
+          <td class="num">${Number(p.odds).toFixed(2)}</td><td class="num">${esc(p.confidence)}%</td>
+          <td><span class="pill ${esc(p.result)}">${esc(p.result)}</span></td>
+          <td class="num ${v>0?'pos':v<0?'neg':''}">${s?fmtMoney(v):'–'}</td></tr>`; }).join('');
+  }).join('') : '<tr><td colspan="7" class="empty">No picks yet.</td></tr>';
+}
+
+fetch('picks.json',{cache:'no-store'}).then(r=>r.json()).then(render).catch(()=>{
+  document.getElementById('slate').innerHTML='<li class="empty">Couldn\'t load the picks. Refresh the page to try again.</li>';
+  document.getElementById('rows').innerHTML='<tr><td colspan="7" class="empty">Couldn\'t load the picks.</td></tr>';
+});
+</script>
+
+</body>
+</html>
