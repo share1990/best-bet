@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-07T15:05:00+01:00",
+ "updated": "2026-10-07T15:45:00+01:00",
  "stake": 5,
  "bankStart": 10,
  "window": {
@@ -168,6 +168,25 @@
     5,
     6
    ]
+  }
+ ],
+ "wildcards": [
+  {
+   "date": "2026-10-07",
+   "sport": "Horse racing",
+   "event": "19:30 Kempton (AW)",
+   "race": "Class 5 handicap, 6f, 12 runners",
+   "start": "2026-10-07T18:30:00Z",
+   "selection": "Charlie Boyo",
+   "odds": 15.0,
+   "ew": {
+    "fraction": 0.25,
+    "places": 3
+   },
+   "winChance": 7,
+   "placeChance": 24,
+   "reason": "Lightly raced; won at Nottingham and third at Bath since, so the mark looks workable. Drawn 4 of 12; 13/8 favourite Kiniro the danger.",
+   "result": "pending"
   }
  ]
 }

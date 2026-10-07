@@ -14,19 +14,19 @@
   --bg:#eef1f4; --surface:#ffffff; --ink:#16202b; --muted:#5d6b7a; --line:#d5dce4;
   --back:#a6d8ff; --back-ink:#0b3b63; --lay:#fac9d4; --lay-ink:#6b1428;
   --win:#13795b; --win-bg:#dcf2e8; --loss:#b3263a; --loss-bg:#fbe1e5; --pend:#8a5a00; --pend-bg:#fdf0d2;
-  --s1:#1f6fb2; --s2:#c2571a; --s3:#7a4bb8; --s4:#13795b;
+  --s1:#1f6fb2; --s2:#c2571a; --s3:#7a4bb8; --s4:#13795b; --s5:#a87a00; --gold:#8a6400; --gold-bg:#fbf1d4;
   --display:"Barlow Condensed","Arial Narrow",sans-serif; --body:"Barlow",system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0f151c; --surface:#18212b; --ink:#e6ecf2; --muted:#93a1b0; --line:#2b3744;
   --back:#2a5f8a; --back-ink:#e3f2ff; --lay:#7a3a49; --lay-ink:#ffe3ea;
   --win:#5fd3a6; --win-bg:#173a2f; --loss:#ff8a9a; --loss-bg:#43202a; --pend:#f3c46a; --pend-bg:#3d3018;
-  --s1:#6cb4f0; --s2:#f2995e; --s3:#b99af0; --s4:#5fd3a6; color-scheme:dark}}
+  --s1:#6cb4f0; --s2:#f2995e; --s3:#b99af0; --s4:#5fd3a6; --s5:#e8c158; --gold:#f0cf6e; --gold-bg:#3a3016; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0f151c; --surface:#18212b; --ink:#e6ecf2; --muted:#93a1b0; --line:#2b3744;
   --back:#2a5f8a; --back-ink:#e3f2ff; --lay:#7a3a49; --lay-ink:#ffe3ea;
   --win:#5fd3a6; --win-bg:#173a2f; --loss:#ff8a9a; --loss-bg:#43202a; --pend:#f3c46a; --pend-bg:#3d3018;
-  --s1:#6cb4f0; --s2:#f2995e; --s3:#b99af0; --s4:#5fd3a6; color-scheme:dark}
+  --s1:#6cb4f0; --s2:#f2995e; --s3:#b99af0; --s4:#5fd3a6; --s5:#e8c158; --gold:#f0cf6e; --gold-bg:#3a3016; color-scheme:dark}
 *{box-sizing:border-box}
 html{color-scheme:light}
 body{margin:0}
@@ -75,11 +75,19 @@ h3{font-family:var(--display);font-weight:600;font-size:.85rem;letter-spacing:.1
 .acca li span:first-child{min-width:0}
 .acca li .num{font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
 .acca-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px}
+.wild{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--gold);border-radius:10px;padding:14px;display:grid;grid-template-columns:1fr auto;gap:4px 14px;align-items:center}
+.wild .who{font-size:1.5rem}
+.wild .ev,.wild .why,.wild .meta{grid-column:1/-1}
+.wild .chip{grid-row:1/3;grid-column:2;background:var(--gold-bg);color:var(--gold)}
+.wild .terms{grid-column:1/-1;font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.placed{background:var(--gold-bg);color:var(--gold)}
+.tag.ew{background:var(--gold-bg);color:var(--gold)}
 .leg-won{color:var(--win)} .leg-lost{color:var(--loss);text-decoration:line-through}
 
 /* strategies */
 .strats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .strat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0;border-top:4px solid var(--c)}
+.strat:last-child:nth-child(odd){grid-column:1/-1}
 .strat .label{font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:.9rem}
 .strat .big{font-family:var(--display);font-weight:700;font-size:2rem;line-height:1.05;font-variant-numeric:tabular-nums}
 .strat .detail{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -145,6 +153,11 @@ footer{color:var(--muted);font-size:.78rem}
   </section>
 
   <section>
+    <h2>Wild card · horse racing</h2>
+    <div id="wild"><div class="wild"><span class="sub">Loading…</span></div></div>
+  </section>
+
+  <section>
     <h2>Strategy tracker</h2>
     <div class="strats" id="strats"></div>
     <div class="chart" style="margin-top:12px">
@@ -187,6 +200,7 @@ footer{color:var(--muted);font-size:.78rem}
     <p><strong>Back</strong> means betting the selection will win. A £5 back at 1.60 makes £3 if it wins and loses £5 if not.</p>
     <p><strong>Lay</strong> means betting the selection will <em>not</em> win, on the exchange. A £5 lay at 4.80 wins £5 if the selection fails to win and loses £19 (5 × 3.80) if it wins.</p>
     <p><strong>Accumulators</strong> combine the day's top back picks. Every leg must win, so the chances multiply down quickly. A void leg drops out. Accas are placed with a bookmaker, so real odds will be a little lower than shown.</p>
+    <p><strong>The wild card</strong> is one bigger-priced horse a day from racing anywhere in the world, backed £5 each-way (£10 in total). Half wins if it wins; the other half pays a fraction of the odds (usually a quarter or a fifth) if it finishes in the places. So a 14/1 shot placing still turns a profit, and a winner pays big. Expect plenty of losing days between hits.</p>
     <p><strong>The No.1 bank</strong> starts with £10 and puts the whole bank on each day's No.1 pick (for a lay, the bank is the amount at risk). Winnings roll into the next day. If a pick loses, the bank is gone; a fresh £10 goes in the next day and the tracker counts how much has been put in overall.</p>
     <p>All profit is before exchange commission (usually 2–5% of winnings).</p>
   </details>
@@ -225,12 +239,20 @@ function accaEval(a, picks, stake){
   const pnl = result==='won' ? stake*(odds-1) : result==='lost' ? -stake : 0;
   return {name:a.name, date:a.date, legs, odds, chance, result, pnl};
 }
+function wildPL(w, stake){
+  const f=(w.ew&&w.ew.fraction)||0.25, o=w.odds;
+  if(w.result==='won') return stake*(o-1) + stake*(o-1)*f;
+  if(w.result==='placed') return -stake + stake*(o-1)*f;
+  if(w.result==='lost') return -2*stake;
+  return 0;
+}
+const wildSettled = r => r==='won'||r==='placed'||r==='lost';
 function compute(data){
   const stake = data.stake || 5;
   const bankStart = data.bankStart || 10;
   const picks = data.picks || [];
   const accas = (data.accas || []).map(a=>accaEval(a,picks,stake));
-  const dates = [...new Set(picks.map(p=>p.date))].sort();
+  const dates = [...new Set([...picks.map(p=>p.date), ...(data.wildcards||[]).map(w=>w.date)])].sort();
 
   // strategy 1: every single at flat stake
   const singles = picks.filter(p=>settledRes(p.result));
@@ -240,6 +262,13 @@ function compute(data){
     return {pl: xs.reduce((s,a)=>s+a.pnl,0), staked: xs.length*stake, n: xs.length, won: xs.filter(a=>a.result==='won').length,
             best: xs.filter(a=>a.result==='won').reduce((m,a)=>Math.max(m,a.odds),0)}; };
   const s2 = accaStrat('Treble'), s3 = accaStrat('5-fold');
+
+  // strategy 5: wild card each-way
+  const wilds = data.wildcards || [];
+  const ws = wilds.filter(w=>wildSettled(w.result));
+  const s5 = {pl: ws.reduce((s,w)=>s+wildPL(w,stake),0), staked: ws.length*stake*2, n: ws.length,
+              won: ws.filter(w=>w.result==='won').length, placed: ws.filter(w=>w.result==='placed').length,
+              best: ws.filter(w=>w.result==='won').reduce((m,w)=>Math.max(m,w.odds),0)};
 
   // strategy 4: rolling No.1 bank, whole bank each day, restart with fresh money after a bust
   let bank=bankStart, invested=bankStart, restarts=0, peak=bankStart, needRestart=false, alive=0, bestRun=0, run=0;
@@ -257,17 +286,18 @@ function compute(data){
   const s4 = {bank, invested, restarts, peak, bestRun, net: bank-invested, bust: needRestart};
 
   // running series by date (cumulative, settled only)
-  const series = {s1:[0], s2:[0], s3:[0], s4:[0]}, labels=['Start'];
-  let c1=0,c2=0,c3=0;
+  const series = {s1:[0], s2:[0], s3:[0], s4:[0], s5:[0]}, labels=['Start'];
+  let c1=0,c2=0,c3=0,c5=0;
   for(const d of dates){
     const day = picks.filter(p=>p.date===d);
-    const any = day.some(p=>settledRes(p.result)) || accas.some(a=>a.date===d && settledRes(a.result));
+    const any = day.some(p=>settledRes(p.result)) || accas.some(a=>a.date===d && settledRes(a.result)) || wilds.some(w=>w.date===d && wildSettled(w.result));
     if(!any) continue;
     c1 += day.reduce((s,p)=>s+singlePL(p,stake),0);
     c2 += accas.filter(a=>a.date===d && a.name==='Treble').reduce((s,a)=>s+a.pnl,0);
     c3 += accas.filter(a=>a.date===d && a.name==='5-fold').reduce((s,a)=>s+a.pnl,0);
     series.s1.push(c1); series.s2.push(c2); series.s3.push(c3);
     series.s4.push(bankByDate[d].bank - bankByDate[d].invested);
+    c5 += wilds.filter(w=>w.date===d).reduce((s,w)=>s+wildPL(w,stake),0); series.s5.push(c5);
     labels.push(d);
   }
 
@@ -284,7 +314,7 @@ function compute(data){
   const groupBy = key => { const m={}; for(const p of singles){ const k=key(p); (m[k]=m[k]||[]).push(p);}
     return Object.entries(m).map(([k,xs])=>({k, n:xs.length, hit: xs.filter(p=>p.result==='won').length/xs.length*100, pl: xs.reduce((s,p)=>s+singlePL(p,stake),0)})).sort((a,b)=>b.pl-a.pl); };
 
-  return {stake, bankStart, picks, accas, dates, s1, s2, s3, s4, series, labels, bestDay, tops, bands,
+  return {stake, bankStart, picks, accas, wilds, dates, s1, s2, s3, s4, s5, series, labels, bestDay, tops, bands,
           bySport: groupBy(p=>p.sport||'Other'), byType: groupBy(p=>isLay(p)?'Lay':'Back')};
 }
 /* ===== end calculations ===== */
@@ -327,6 +357,22 @@ function render(data){
       <div class="acca-foot"><span>About ${Math.round(e.chance*100)}% chance · £${stake} returns £${(stake*e.odds).toFixed(2)}</span><span class="pill ${e.result}">${e.result}</span></div>
     </div>`).join('') : '<div class="acca"><span class="sub">No accumulators today.</span></div>';
 
+  // wild card
+  const tw = R.wilds.filter(w=>w.date===today);
+  const frac = f => f===0.25?'1/4':f===0.2?'1/5':f===0.5?'1/2':f===(1/3)?'1/3':String(f);
+  const toFrac = o => { const v=o-1; const den=[1,2,3,4,5,6,8,10,11,13]; for(const d of den){ const n=Math.round(v*d); if(Math.abs(n/d-v)<0.02) return n+'/'+d; } return v.toFixed(2)+'/1'; };
+  document.getElementById('wild').innerHTML = tw.length ? tw.map(w=>{
+    const f=(w.ew&&w.ew.fraction)||0.25, pl=(w.ew&&w.ew.places)||3;
+    const winRet = wildPL({...w,result:'won'},stake)+2*stake, placeRet = wildPL({...w,result:'placed'},stake)+2*stake;
+    return `<div class="wild">
+      <div class="who">${esc(w.selection)}</div>
+      <div class="chip"><span>Each-way</span><b>${Number(w.odds).toFixed(2)}</b></div>
+      <div class="ev">${esc(w.event)} · ${esc(w.race||'')}</div>
+      <div class="why">${esc(w.reason)}</div>
+      <div class="terms">${toFrac(w.odds)} · ${frac(f)} odds, ${pl} places · £${stake} e/w (£${stake*2}) returns £${winRet.toFixed(2)} if it wins, £${placeRet.toFixed(2)} if it places</div>
+      <div class="meta"><span>${esc(fmtStart(w.start))}</span><span>·</span><span>${esc(w.winChance)}% to win, ${esc(w.placeChance)}% to place</span><span class="pill ${esc(w.result)}">${esc(w.result)}</span></div>
+    </div>`;}).join('') : '<div class="wild"><span class="sub">No wild card today.</span></div>';
+
   // strategy cards
   const s4 = R.s4;
   const strats = [
@@ -335,12 +381,14 @@ function render(data){
     {c:'--s3', label:`5-fold at £${stake} a day`, big:R.s3.n?fmtSigned(R.s3.pl):'£0.00', v:R.s3.pl, detail: R.s3.n ? `${R.s3.won}/${R.s3.n} landed · £${R.s3.staked} staked${R.s3.best?` · best ${R.s3.best.toFixed(2)}`:''}` : 'Waiting for the first 5-fold to settle'},
     {c:'--s4', label:`No.1 bank from £${R.bankStart}`, big: s4.bust ? '£0.00' : fmtMoney(s4.bank), v: s4.net,
       detail: `${s4.bust?'Bust, fresh £'+R.bankStart+' goes in next pick · ':''}£${s4.invested} put in · net ${fmtSigned(s4.net)} · peak ${fmtMoney(s4.peak)} · best run ${s4.bestRun} win${s4.bestRun===1?'':'s'}${s4.restarts?` · ${s4.restarts} restart${s4.restarts===1?'':'s'}`:''}`}
+    ,{c:'--s5', label:`Wild card at £${stake} e/w a day`, big:R.s5.n?fmtSigned(R.s5.pl):'£0.00', v:R.s5.pl,
+      detail: R.s5.n ? `${R.s5.won} won, ${R.s5.placed} placed of ${R.s5.n} · £${R.s5.staked} staked · ${roi(R.s5.pl,R.s5.staked)}${R.s5.best?` · best winner ${R.s5.best.toFixed(2)}`:''}` : 'Waiting for the first wild card to run'}
   ];
   document.getElementById('strats').innerHTML = strats.map(s=>`<div class="strat" style="--c:var(${s.c})">
       <span class="label">${esc(s.label)}</span><span class="big ${cls(s.v)}">${esc(s.big)}</span><span class="detail">${esc(s.detail)}</span></div>`).join('');
 
   // chart
-  const svg=document.getElementById('chart'), L=R.labels, keys=['s1','s2','s3','s4'];
+  const svg=document.getElementById('chart'), L=R.labels, keys=['s1','s2','s3','s4','s5'];
   document.getElementById('legend').innerHTML = strats.map(s=>`<span><i style="--c:var(${s.c})"></i>${esc(s.label)}</span>`).join('');
   if(L.length<2){ svg.innerHTML='<text x="320" y="114" text-anchor="middle" fill="var(--muted)" font-size="14">The lines start once the first bets settle</text>'; }
   else {
@@ -385,7 +433,11 @@ function render(data){
           <td><span class="tag ${isLay(p)?'lay':'back'}">${isLay(p)?'Lay':'Back'}</span></td>
           <td class="num">${Number(p.odds).toFixed(2)}</td><td class="num">${esc(p.confidence)}%</td>
           <td><span class="pill ${esc(p.result)}">${esc(p.result)}</span></td>
-          <td class="num ${cls(v)}">${settledRes(p.result)?fmtSigned(v):'–'}</td></tr>`; }).join('');
+          <td class="num ${cls(v)}">${settledRes(p.result)?fmtSigned(v):'–'}</td></tr>`; }).join('') +
+      R.wilds.filter(w=>w.date===d).map(w=>{ const v=wildPL(w,stake);
+        return `<tr><td>WC</td><td class="sel2"><strong>${esc(w.selection)}</strong><br><span class="sub">${esc(w.event)}</span></td>
+          <td><span class="tag ew">E/W</span></td><td class="num">${Number(w.odds).toFixed(2)}</td><td class="num">${esc(w.winChance)}%</td>
+          <td><span class="pill ${esc(w.result)}">${esc(w.result)}</span></td><td class="num ${cls(v)}">${wildSettled(w.result)?fmtSigned(v):'–'}</td></tr>`; }).join('');
   }).join('') : '<tr><td colspan="7" class="empty">No picks yet.</td></tr>';
 }
 
