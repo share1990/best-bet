@@ -9,34 +9,40 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
 <style>
-/* Layout: one narrow column like an exchange ladder — today's ranked slate, then the record, then the ledger. */
+/* Layout: one narrow column like an exchange ladder — today's slate, accas, then the strategy ledger and what the record says. */
 :root{
   --bg:#eef1f4; --surface:#ffffff; --ink:#16202b; --muted:#5d6b7a; --line:#d5dce4;
   --back:#a6d8ff; --back-ink:#0b3b63; --lay:#fac9d4; --lay-ink:#6b1428;
   --win:#13795b; --win-bg:#dcf2e8; --loss:#b3263a; --loss-bg:#fbe1e5; --pend:#8a5a00; --pend-bg:#fdf0d2;
+  --s1:#1f6fb2; --s2:#c2571a; --s3:#7a4bb8; --s4:#13795b;
   --display:"Barlow Condensed","Arial Narrow",sans-serif; --body:"Barlow",system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0f151c; --surface:#18212b; --ink:#e6ecf2; --muted:#93a1b0; --line:#2b3744;
   --back:#2a5f8a; --back-ink:#e3f2ff; --lay:#7a3a49; --lay-ink:#ffe3ea;
-  --win:#5fd3a6; --win-bg:#173a2f; --loss:#ff8a9a; --loss-bg:#43202a; --pend:#f3c46a; --pend-bg:#3d3018; color-scheme:dark}}
+  --win:#5fd3a6; --win-bg:#173a2f; --loss:#ff8a9a; --loss-bg:#43202a; --pend:#f3c46a; --pend-bg:#3d3018;
+  --s1:#6cb4f0; --s2:#f2995e; --s3:#b99af0; --s4:#5fd3a6; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0f151c; --surface:#18212b; --ink:#e6ecf2; --muted:#93a1b0; --line:#2b3744;
   --back:#2a5f8a; --back-ink:#e3f2ff; --lay:#7a3a49; --lay-ink:#ffe3ea;
-  --win:#5fd3a6; --win-bg:#173a2f; --loss:#ff8a9a; --loss-bg:#43202a; --pend:#f3c46a; --pend-bg:#3d3018; color-scheme:dark}
+  --win:#5fd3a6; --win-bg:#173a2f; --loss:#ff8a9a; --loss-bg:#43202a; --pend:#f3c46a; --pend-bg:#3d3018;
+  --s1:#6cb4f0; --s2:#f2995e; --s3:#b99af0; --s4:#5fd3a6; color-scheme:dark}
 *{box-sizing:border-box}
 html{color-scheme:light}
 body{margin:0}
 img{max-width:100%}
 [hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;padding-inline:16px;padding-block:20px 40px}
-.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+.wrap{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:26px}
 header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
 h1{font-family:var(--display);font-weight:700;font-size:2rem;letter-spacing:.01em;margin:0;text-transform:uppercase}
 .sub{color:var(--muted);font-size:.85rem}
 h2{font-family:var(--display);font-weight:600;font-size:.95rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+h3{font-family:var(--display);font-weight:600;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
 .window{color:var(--muted);font-size:.85rem;margin:-4px 0 10px}
+.pos{color:var(--win)} .neg{color:var(--loss)}
 
+/* slate */
 .slate{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:10px}
 .pick{display:grid;grid-template-columns:2.2rem 1fr auto;gap:2px 12px;padding:12px 14px;border-bottom:1px solid var(--line);align-items:center}
 .pick:last-child{border-bottom:0}
@@ -46,38 +52,21 @@ h2{font-family:var(--display);font-weight:600;font-size:.95rem;letter-spacing:.1
 .who{font-family:var(--display);font-weight:700;font-size:1.25rem;line-height:1.1;min-width:0;text-wrap:balance}
 .ev{color:var(--muted);font-size:.85rem;min-width:0;grid-column:2}
 .why{grid-column:2/4;font-size:.9rem;min-width:0}
-.chip{grid-row:1/3;grid-column:3;border-radius:6px;padding:5px 10px;text-align:center;font-family:var(--display);min-width:72px}
+.chip{border-radius:6px;padding:5px 10px;text-align:center;font-family:var(--display);min-width:72px}
+.pick .chip{grid-row:1/3;grid-column:3}
 .chip span{display:block;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase}
 .chip b{display:block;font-size:1.45rem;line-height:1;font-variant-numeric:tabular-nums}
 .chip.back{background:var(--back);color:var(--back-ink)}
 .chip.lay{background:var(--lay);color:var(--lay-ink)}
 .meta{grid-column:2/4;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:.8rem;color:var(--muted)}
-
 .pill{font-family:var(--display);font-weight:600;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;padding:1px 8px;border-radius:999px}
 .won{background:var(--win-bg);color:var(--win)} .lost{background:var(--loss-bg);color:var(--loss)}
 .pending{background:var(--pend-bg);color:var(--pend)} .void{background:var(--line);color:var(--muted)}
 .tag{font-family:var(--display);font-weight:600;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:1px 6px;border-radius:4px}
 .tag.back{background:var(--back);color:var(--back-ink)} .tag.lay{background:var(--lay);color:var(--lay-ink)}
 
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
-.stat b{display:block;font-family:var(--display);font-size:1.6rem;font-variant-numeric:tabular-nums}
-.stat span{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-.pos{color:var(--win)} .neg{color:var(--loss)}
-@media (max-width:540px){.stats{grid-template-columns:repeat(2,1fr)}}
-.chart{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px}
-.chart svg{display:block;width:100%;height:140px}
-.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px}
-table{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
-th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
-th{font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.75rem;color:var(--muted)}
-td.sel2{white-space:normal;min-width:170px}
-td.num,th.num{text-align:right}
-tr.day td{background:var(--bg);font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:.8rem;color:var(--muted)}
-tr:last-child td{border-bottom:0}
-.empty{color:var(--muted);padding:18px;text-align:center}
+/* accas */
 .accas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-@media (max-width:540px){.accas{grid-template-columns:1fr}}
 .acca{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .acca-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .acca-name{font-family:var(--display);font-weight:700;font-size:1.3rem;text-transform:uppercase;letter-spacing:.03em}
@@ -87,8 +76,49 @@ tr:last-child td{border-bottom:0}
 .acca li .num{font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
 .acca-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px}
 .leg-won{color:var(--win)} .leg-lost{color:var(--loss);text-decoration:line-through}
-.statline{margin-top:10px;font-size:.88rem;color:var(--muted)}
-.statline b{color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* strategies */
+.strats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.strat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0;border-top:4px solid var(--c)}
+.strat .label{font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:.9rem}
+.strat .big{font-family:var(--display);font-weight:700;font-size:2rem;line-height:1.05;font-variant-numeric:tabular-nums}
+.strat .detail{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px}
+.chart svg{display:block;width:100%;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.8rem;color:var(--muted);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:14px;height:3px;border-radius:2px;background:var(--c);display:inline-block}
+
+/* record + insights */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-width:0}
+.stat b{display:block;font-family:var(--display);font-size:1.6rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.insights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
+.panel.wide{grid-column:1/-1}
+.panel p{margin:0 0 8px;font-size:.85rem;color:var(--muted)}
+.mini{width:100%;border-collapse:collapse;font-size:.85rem;font-variant-numeric:tabular-nums}
+.mini th,.mini td{padding:5px 4px;border-bottom:1px solid var(--line);text-align:left}
+.mini th{font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:.72rem;color:var(--muted)}
+.mini td.num,.mini th.num{text-align:right}
+.mini tr:last-child td{border-bottom:0}
+.cal{display:flex;align-items:center;gap:6px}
+.calbar{position:relative;flex:1;height:8px;background:var(--line);border-radius:4px;min-width:60px}
+.calbar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--s1)}
+.calbar em{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink)}
+.empty{color:var(--muted);padding:14px;text-align:center;font-size:.88rem}
+
+@media (max-width:560px){.stats{grid-template-columns:repeat(2,1fr)}.accas,.strats,.insights{grid-template-columns:1fr}}
+
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+table.ledger{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+.ledger th,.ledger td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+.ledger th{font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.75rem;color:var(--muted)}
+.ledger td.sel2{white-space:normal;min-width:170px}
+.ledger td.num,.ledger th.num{text-align:right}
+.ledger tr.day td{background:var(--bg);font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:.8rem;color:var(--muted)}
+.ledger tr:last-child td{border-bottom:0}
 details{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:.88rem}
 summary{cursor:pointer;font-weight:600}
 summary:focus-visible{outline:2px solid var(--back-ink);outline-offset:2px}
@@ -114,143 +144,248 @@ footer{color:var(--muted);font-size:.78rem}
     <div class="accas" id="accas"><div class="acca"><span class="sub">Loading…</span></div></div>
   </section>
 
-  <details>
-    <summary>How back and lay bets are scored</summary>
-    <p><strong>Back</strong> means betting the selection will win. A £10 back bet at 1.60 returns £6 profit if it wins and loses £10 if it doesn't.</p>
-    <p><strong>Lay</strong> means betting the selection will <em>not</em> win, on the exchange. A £10 lay at 4.80 wins £10 if the selection fails to win, and loses £38 (10 × 3.80) if it wins. Lays win more often but cost more when they lose.</p>
-    <p><strong>Accumulators</strong> combine the day's top back picks into one bet. Every leg must win. The odds multiply together, and so do the chances, so a treble of 65% picks lands only about a quarter of the time. A void leg drops out and the rest still count. Place accas with a bookmaker, as the exchange doesn't offer them, so expect slightly lower odds than shown.</p>
-  </details>
+  <section>
+    <h2>Strategy tracker</h2>
+    <div class="strats" id="strats"></div>
+    <div class="chart" style="margin-top:12px">
+      <svg id="chart" viewBox="0 0 640 220" role="img" aria-label="Running profit for each strategy"></svg>
+      <div class="legend" id="legend"></div>
+    </div>
+  </section>
 
   <section>
-    <h2>Record at £<span id="stakeLbl">10</span> level stakes</h2>
+    <h2>The record</h2>
     <div class="stats">
       <div class="stat"><b id="sPicks">–</b><span>Settled bets</span></div>
       <div class="stat"><b id="sHit">–</b><span>Hit rate</span></div>
-      <div class="stat"><b id="sProfit">–</b><span>Profit</span></div>
       <div class="stat"><b id="sTop">–</b><span>No.1 picks hit</span></div>
+      <div class="stat"><b id="sBest">–</b><span>Best day (all 10)</span></div>
     </div>
-    <p class="statline" id="accaRecord">Accumulators: no settled accas yet.</p>
   </section>
 
   <section>
-    <h2>Running profit</h2>
-    <div class="chart"><svg id="chart" viewBox="0 0 600 140" preserveAspectRatio="none" role="img" aria-label="Running profit chart"></svg></div>
+    <h2>What the record says</h2>
+    <div class="insights">
+      <div class="panel wide">
+        <h3>Is the confidence honest?</h3>
+        <p>When I say 65%, those bets should land about 65% of the time. The bar is how often they actually landed; the black mark is what I predicted.</p>
+        <div id="calib"></div>
+      </div>
+      <div class="panel">
+        <h3>By sport</h3>
+        <div id="bySport"></div>
+      </div>
+      <div class="panel">
+        <h3>Back v lay</h3>
+        <div id="byType"></div>
+      </div>
+    </div>
   </section>
+
+  <details>
+    <summary>How the bets and trackers are scored</summary>
+    <p><strong>Back</strong> means betting the selection will win. A £5 back at 1.60 makes £3 if it wins and loses £5 if not.</p>
+    <p><strong>Lay</strong> means betting the selection will <em>not</em> win, on the exchange. A £5 lay at 4.80 wins £5 if the selection fails to win and loses £19 (5 × 3.80) if it wins.</p>
+    <p><strong>Accumulators</strong> combine the day's top back picks. Every leg must win, so the chances multiply down quickly. A void leg drops out. Accas are placed with a bookmaker, so real odds will be a little lower than shown.</p>
+    <p><strong>The No.1 bank</strong> starts with £10 and puts the whole bank on each day's No.1 pick (for a lay, the bank is the amount at risk). Winnings roll into the next day. If a pick loses, the bank is gone; a fresh £10 goes in the next day and the tracker counts how much has been put in overall.</p>
+    <p>All profit is before exchange commission (usually 2–5% of winnings).</p>
+  </details>
 
   <section>
     <h2>Every pick</h2>
     <div class="tablewrap">
-      <table>
-        <thead><tr><th>#</th><th>Pick</th><th>Bet</th><th class="num">Odds</th><th class="num">Conf.</th><th>Result</th><th class="num">P/L</th></tr></thead>
+      <table class="ledger">
+        <thead><tr><th>#</th><th>Pick</th><th>Bet</th><th class="num">Odds</th><th class="num">Conf.</th><th>Result</th><th class="num">P/L at £<span id="stakeLbl">5</span></th></tr></thead>
         <tbody id="rows"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
       </table>
     </div>
   </section>
 
-  <footer>Ten ranked picks posted by 12:00 UK time, covering events from noon until 11:59 the next morning. Odds are Betfair Exchange prices where available; profit shown before exchange commission. For fun among friends, not advice. Please gamble responsibly.</footer>
+  <footer>Ten ranked picks plus two accumulators, posted by 12:00 UK time, covering events from noon until 11:59 the next morning. Odds are Betfair Exchange prices where available. For fun among friends, not advice. Please gamble responsibly.</footer>
 </div>
 
 <script>
-const fmtMoney = v => (v<0?'−£':'£') + Math.abs(v).toFixed(2);
+/* ===== calculations (pure) ===== */
+const isLay = p => p.type==='lay';
+const settledRes = r => r==='won'||r==='lost';
+function singlePL(p, stake){
+  if(p.result==='won') return isLay(p) ? stake : stake*(p.odds-1);
+  if(p.result==='lost') return isLay(p) ? -stake*(p.odds-1) : -stake;
+  return 0;
+}
+function accaEval(a, picks, stake){
+  const legs=(a.legs||[]).map(r=>picks.find(p=>p.date===a.date && p.rank===r)).filter(Boolean);
+  const live=legs.filter(l=>l.result!=='void');
+  const odds=live.reduce((m,l)=>m*l.odds,1);
+  const chance=live.reduce((m,l)=>m*(l.confidence/100),1);
+  let result='pending';
+  if(legs.length && legs.every(l=>l.result==='void')) result='void';
+  else if(legs.some(l=>l.result==='lost')) result='lost';
+  else if(legs.length && legs.every(l=>l.result==='won'||l.result==='void')) result='won';
+  const pnl = result==='won' ? stake*(odds-1) : result==='lost' ? -stake : 0;
+  return {name:a.name, date:a.date, legs, odds, chance, result, pnl};
+}
+function compute(data){
+  const stake = data.stake || 5;
+  const bankStart = data.bankStart || 10;
+  const picks = data.picks || [];
+  const accas = (data.accas || []).map(a=>accaEval(a,picks,stake));
+  const dates = [...new Set(picks.map(p=>p.date))].sort();
+
+  // strategy 1: every single at flat stake
+  const singles = picks.filter(p=>settledRes(p.result));
+  const s1 = {pl: singles.reduce((s,p)=>s+singlePL(p,stake),0), staked: singles.length*stake, n: singles.length, won: singles.filter(p=>p.result==='won').length};
+  // strategies 2/3: treble and 5-fold
+  const accaStrat = name => { const xs=accas.filter(a=>a.name===name && settledRes(a.result));
+    return {pl: xs.reduce((s,a)=>s+a.pnl,0), staked: xs.length*stake, n: xs.length, won: xs.filter(a=>a.result==='won').length,
+            best: xs.filter(a=>a.result==='won').reduce((m,a)=>Math.max(m,a.odds),0)}; };
+  const s2 = accaStrat('Treble'), s3 = accaStrat('5-fold');
+
+  // strategy 4: rolling No.1 bank, whole bank each day, restart with fresh money after a bust
+  let bank=bankStart, invested=bankStart, restarts=0, peak=bankStart, needRestart=false, alive=0, bestRun=0, run=0;
+  const bankByDate = {};
+  for(const d of dates){
+    const p = picks.find(x=>x.date===d && x.rank===1);
+    if(p && (settledRes(p.result) || p.result==='void')){
+      if(needRestart){ bank=bankStart; invested+=bankStart; restarts++; needRestart=false; run=0; }
+      if(p.result==='won'){ bank = isLay(p) ? bank + bank/(p.odds-1) : bank*p.odds; run++; alive++; }
+      else if(p.result==='lost'){ bank = 0; needRestart=true; run=0; }
+      bestRun=Math.max(bestRun,run); peak=Math.max(peak,bank);
+    }
+    bankByDate[d] = {bank, invested};
+  }
+  const s4 = {bank, invested, restarts, peak, bestRun, net: bank-invested, bust: needRestart};
+
+  // running series by date (cumulative, settled only)
+  const series = {s1:[0], s2:[0], s3:[0], s4:[0]}, labels=['Start'];
+  let c1=0,c2=0,c3=0;
+  for(const d of dates){
+    const day = picks.filter(p=>p.date===d);
+    const any = day.some(p=>settledRes(p.result)) || accas.some(a=>a.date===d && settledRes(a.result));
+    if(!any) continue;
+    c1 += day.reduce((s,p)=>s+singlePL(p,stake),0);
+    c2 += accas.filter(a=>a.date===d && a.name==='Treble').reduce((s,a)=>s+a.pnl,0);
+    c3 += accas.filter(a=>a.date===d && a.name==='5-fold').reduce((s,a)=>s+a.pnl,0);
+    series.s1.push(c1); series.s2.push(c2); series.s3.push(c3);
+    series.s4.push(bankByDate[d].bank - bankByDate[d].invested);
+    labels.push(d);
+  }
+
+  // record
+  const dayPL = dates.map(d=>({d, pl: picks.filter(p=>p.date===d).reduce((s,p)=>s+singlePL(p,stake),0), any: picks.some(p=>p.date===d && settledRes(p.result))})).filter(x=>x.any);
+  const bestDay = dayPL.reduce((b,x)=>(!b||x.pl>b.pl)?x:b, null);
+  const tops = singles.filter(p=>p.rank===1);
+
+  // calibration bands
+  const bands=[[0,55,'Under 55%'],[55,65,'55–64%'],[65,75,'65–74%'],[75,101,'75% +']].map(([lo,hi,label])=>{
+    const xs=singles.filter(p=>p.confidence>=lo && p.confidence<hi);
+    return {label, n:xs.length, predicted: xs.length? xs.reduce((s,p)=>s+p.confidence,0)/xs.length : null, actual: xs.length? xs.filter(p=>p.result==='won').length/xs.length*100 : null};
+  });
+  const groupBy = key => { const m={}; for(const p of singles){ const k=key(p); (m[k]=m[k]||[]).push(p);}
+    return Object.entries(m).map(([k,xs])=>({k, n:xs.length, hit: xs.filter(p=>p.result==='won').length/xs.length*100, pl: xs.reduce((s,p)=>s+singlePL(p,stake),0)})).sort((a,b)=>b.pl-a.pl); };
+
+  return {stake, bankStart, picks, accas, dates, s1, s2, s3, s4, series, labels, bestDay, tops, bands,
+          bySport: groupBy(p=>p.sport||'Other'), byType: groupBy(p=>isLay(p)?'Lay':'Back')};
+}
+/* ===== end calculations ===== */
+
+const fmtMoney = v => (v<-0.004?'−£':'£') + Math.abs(v).toFixed(2);
+const fmtSigned = v => (v>0.004?'+':'') + fmtMoney(v);
+const cls = v => v>0.004?'pos':v<-0.004?'neg':'';
 const fmtDate = d => new Date(d+'T12:00:00Z').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
 const ukTime = (iso,opts) => { try { return new Date(iso).toLocaleString('en-GB',Object.assign({timeZone:'Europe/London'},opts)); } catch(e){ return ''; } };
 const fmtStart = iso => ukTime(iso,{weekday:'short',hour:'2-digit',minute:'2-digit'}) + ' UK';
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const isLay = p => p.type==='lay';
-const pl = (p, stake) => {
-  if(p.result==='won') return isLay(p) ? stake : stake*(p.odds-1);
-  if(p.result==='lost') return isLay(p) ? -stake*(p.odds-1) : -stake;
-  return 0;
-};
-const betLabel = p => isLay(p) ? 'Lay' : 'Back';
+const pct = v => v==null ? '–' : Math.round(v)+'%';
+const roi = (pl,staked) => staked ? Math.round(pl/staked*100)+'% return' : 'no settled bets yet';
 
 function render(data){
-  const stake = data.stake || 10;
+  const R = compute(data), stake=R.stake;
   document.getElementById('stakeLbl').textContent = stake;
   document.getElementById('updated').textContent = data.updated ? 'Updated ' + ukTime(data.updated,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
-  const picks = (data.picks||[]).slice();
-  const dates = [...new Set(picks.map(p=>p.date))].sort().reverse();
-  const today = dates[0];
-
+  const today = R.dates[R.dates.length-1];
   const w = data.window;
   document.getElementById('window').textContent = w ? `Events from ${ukTime(w.from,{weekday:'short',hour:'2-digit',minute:'2-digit'})} to ${ukTime(w.to,{weekday:'short',hour:'2-digit',minute:'2-digit'})} UK. Ranked by chance of the bet landing.` : '';
 
-  const slate = document.getElementById('slate');
-  const todays = picks.filter(p=>p.date===today).sort((a,b)=>(a.rank||99)-(b.rank||99));
-  slate.innerHTML = todays.length ? todays.map(p=>`
+  // slate
+  const todays = R.picks.filter(p=>p.date===today).sort((a,b)=>(a.rank||99)-(b.rank||99));
+  document.getElementById('slate').innerHTML = todays.length ? todays.map(p=>`
     <li class="pick${p.rank===1?' top':''}">
       <div class="rank">${esc(p.rank)}</div>
       <div class="who">${isLay(p)?'Against ':''}${esc(p.selection)}</div>
-      <div class="chip ${isLay(p)?'lay':'back'}"><span>${betLabel(p)}</span><b>${Number(p.odds).toFixed(2)}</b></div>
+      <div class="chip ${isLay(p)?'lay':'back'}"><span>${isLay(p)?'Lay':'Back'}</span><b>${Number(p.odds).toFixed(2)}</b></div>
       <div class="ev">${esc(p.event)} · ${esc(p.sport)}</div>
       <div class="why">${esc(p.reason)}</div>
       <div class="meta"><span>${esc(fmtStart(p.start))}</span><span>·</span><span>${esc(p.confidence)}% confidence</span><span class="pill ${esc(p.result)}">${esc(p.result)}</span></div>
     </li>`).join('') : '<li class="empty">No picks yet. The first slate appears at 12:00.</li>';
 
-  // accumulators: legs reference that day's ranks; odds, chance and result are derived from the legs
-  const accaEval = a => {
-    const legs = (a.legs||[]).map(r=>picks.find(p=>p.date===a.date && p.rank===r)).filter(Boolean);
-    const live = legs.filter(l=>l.result!=='void');
-    const odds = live.reduce((m,l)=>m*l.odds,1);
-    const chance = live.reduce((m,l)=>m*(l.confidence/100),1);
-    let result='pending';
-    if(legs.length && legs.every(l=>l.result==='void')) result='void';
-    else if(legs.some(l=>l.result==='lost')) result='lost';
-    else if(legs.length && legs.every(l=>l.result==='won'||l.result==='void')) result='won';
-    const pnl = result==='won' ? stake*(odds-1) : result==='lost' ? -stake : 0;
-    return {legs, odds, chance, result, pnl};
-  };
-  const accas = data.accas||[];
-  const todayAccas = accas.filter(a=>a.date===today).sort((a,b)=>(a.legs||[]).length-(b.legs||[]).length);
-  document.getElementById('accas').innerHTML = todayAccas.length ? todayAccas.map(a=>{
-    const e=accaEval(a);
-    return `<div class="acca">
-      <div class="acca-head"><span class="acca-name">${esc(a.name||((a.legs||[]).length+'-fold'))}</span><div class="chip back" style="grid-row:auto;grid-column:auto"><span>Odds</span><b>${e.odds.toFixed(2)}</b></div></div>
+  // accas
+  const ta = R.accas.filter(a=>a.date===today).sort((a,b)=>a.legs.length-b.legs.length);
+  document.getElementById('accas').innerHTML = ta.length ? ta.map(e=>`<div class="acca">
+      <div class="acca-head"><span class="acca-name">${esc(e.name)}</span><div class="chip back"><span>Odds</span><b>${e.odds.toFixed(2)}</b></div></div>
       <ul>${e.legs.map(l=>`<li><span class="${l.result==='won'?'leg-won':l.result==='lost'?'leg-lost':''}">#${esc(l.rank)} ${esc(l.selection)}</span><span class="num">${Number(l.odds).toFixed(2)}</span></li>`).join('')}</ul>
       <div class="acca-foot"><span>About ${Math.round(e.chance*100)}% chance · £${stake} returns £${(stake*e.odds).toFixed(2)}</span><span class="pill ${e.result}">${e.result}</span></div>
-    </div>`;}).join('') : '<div class="acca"><span class="sub">No accumulators today.</span></div>';
-  const accaSettled = accas.map(accaEval).filter(e=>e.result==='won'||e.result==='lost');
-  if(accaSettled.length){
-    const aw=accaSettled.filter(e=>e.result==='won').length, ap=accaSettled.reduce((s,e)=>s+e.pnl,0);
-    document.getElementById('accaRecord').innerHTML = `Accumulators: <b>${aw}/${accaSettled.length}</b> landed · profit <b class="${ap>0?'pos':ap<0?'neg':''}">${fmtMoney(ap)}</b> at £${stake} each`;
-  }
+    </div>`).join('') : '<div class="acca"><span class="sub">No accumulators today.</span></div>';
 
-  const settled = picks.filter(p=>p.result==='won'||p.result==='lost').sort((a,b)=> (a.date+String(a.start)) < (b.date+String(b.start)) ? -1 : 1);
-  const wins = settled.filter(p=>p.result==='won').length;
-  const profit = settled.reduce((s,p)=>s+pl(p,stake),0);
-  document.getElementById('sPicks').textContent = settled.length;
-  document.getElementById('sHit').textContent = settled.length ? Math.round(wins/settled.length*100)+'%' : '–';
-  const pe = document.getElementById('sProfit'); pe.textContent = settled.length ? fmtMoney(profit) : '–';
-  pe.className = profit>0?'pos':profit<0?'neg':'';
-  const tops = settled.filter(p=>p.rank===1);
-  document.getElementById('sTop').textContent = tops.length ? `${tops.filter(p=>p.result==='won').length}/${tops.length}` : '–';
+  // strategy cards
+  const s4 = R.s4;
+  const strats = [
+    {c:'--s1', label:`All 10 at £${stake} each`, big:R.s1.n?fmtSigned(R.s1.pl):'£0.00', v:R.s1.pl, detail: R.s1.n ? `${R.s1.won}/${R.s1.n} won · £${R.s1.staked} staked · ${roi(R.s1.pl,R.s1.staked)}` : 'Waiting for the first results'},
+    {c:'--s2', label:`Treble at £${stake} a day`, big:R.s2.n?fmtSigned(R.s2.pl):'£0.00', v:R.s2.pl, detail: R.s2.n ? `${R.s2.won}/${R.s2.n} landed · £${R.s2.staked} staked · ${roi(R.s2.pl,R.s2.staked)}` : 'Waiting for the first treble to settle'},
+    {c:'--s3', label:`5-fold at £${stake} a day`, big:R.s3.n?fmtSigned(R.s3.pl):'£0.00', v:R.s3.pl, detail: R.s3.n ? `${R.s3.won}/${R.s3.n} landed · £${R.s3.staked} staked${R.s3.best?` · best ${R.s3.best.toFixed(2)}`:''}` : 'Waiting for the first 5-fold to settle'},
+    {c:'--s4', label:`No.1 bank from £${R.bankStart}`, big: s4.bust ? '£0.00' : fmtMoney(s4.bank), v: s4.net,
+      detail: `${s4.bust?'Bust, fresh £'+R.bankStart+' goes in next pick · ':''}£${s4.invested} put in · net ${fmtSigned(s4.net)} · peak ${fmtMoney(s4.peak)} · best run ${s4.bestRun} win${s4.bestRun===1?'':'s'}${s4.restarts?` · ${s4.restarts} restart${s4.restarts===1?'':'s'}`:''}`}
+  ];
+  document.getElementById('strats').innerHTML = strats.map(s=>`<div class="strat" style="--c:var(${s.c})">
+      <span class="label">${esc(s.label)}</span><span class="big ${cls(s.v)}">${esc(s.big)}</span><span class="detail">${esc(s.detail)}</span></div>`).join('');
 
-  const svg = document.getElementById('chart');
-  if(!settled.length){ svg.innerHTML = '<text x="300" y="74" text-anchor="middle" fill="var(--muted)" font-size="13">The line starts once the first bets are settled</text>'; }
+  // chart
+  const svg=document.getElementById('chart'), L=R.labels, keys=['s1','s2','s3','s4'];
+  document.getElementById('legend').innerHTML = strats.map(s=>`<span><i style="--c:var(${s.c})"></i>${esc(s.label)}</span>`).join('');
+  if(L.length<2){ svg.innerHTML='<text x="320" y="114" text-anchor="middle" fill="var(--muted)" font-size="14">The lines start once the first bets settle</text>'; }
   else {
-    let c=0; const pts=[0, ...settled.map(p=>(c+=pl(p,stake)))];
-    const mn=Math.min(0,...pts), mx=Math.max(0,...pts), rng=(mx-mn)||1;
-    const X=i=>10+i*(580/Math.max(1,pts.length-1)), Y=v=>125-(v-mn)/rng*110;
-    const d=pts.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
-    const last=pts[pts.length-1], col=last>=0?'var(--win)':'var(--loss)';
-    svg.innerHTML = `<line x1="10" x2="590" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line)" stroke-dasharray="4 4"/>
-      <path d="${d} L${X(pts.length-1)} ${Y(0)} L10 ${Y(0)} Z" fill="${col}" fill-opacity=".12"/>
-      <path d="${d}" fill="none" stroke="${col}" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
-      <circle cx="${X(pts.length-1)}" cy="${Y(last)}" r="4" fill="${col}"/>`;
+    const all=keys.flatMap(k=>R.series[k]); let mn=Math.min(0,...all), mx=Math.max(0,...all); if(mx-mn<1){mx+=1;mn-=1;}
+    const padL=52,padR=12,padT=12,padB=28,W=640-padL-padR,H=220-padT-padB;
+    const X=i=>padL+i*(W/Math.max(1,L.length-1)), Y=v=>padT+(mx-v)/(mx-mn)*H;
+    const step = (()=>{ const r=(mx-mn)/4, p=Math.pow(10,Math.floor(Math.log10(r))); return [1,2,5,10].map(m=>m*p).find(s=>s>=r)||r; })();
+    let grid=''; for(let v=Math.ceil(mn/step)*step; v<=mx+1e-9; v+=step){ grid+=`<line x1="${padL}" x2="${640-padR}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)" ${Math.abs(v)<1e-9?'':'stroke-dasharray="3 4"'}/><text x="${padL-6}" y="${Y(v)+4}" text-anchor="end" fill="var(--muted)" font-size="11">${v<0?'−':''}£${Math.abs(v).toFixed(step<1?2:0)}</text>`; }
+    const xl=[0,L.length-1]; if(L.length>4) xl.splice(1,0,Math.floor((L.length-1)/2));
+    const xt=xl.map(i=>`<text x="${X(i)}" y="${220-8}" text-anchor="${i===0?'start':i===L.length-1?'end':'middle'}" fill="var(--muted)" font-size="11">${i===0?'Start':esc(fmtDate(L[i]))}</text>`).join('');
+    const lines=keys.map((k,ki)=>{ const pts=R.series[k]; const d=pts.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
+      const last=pts[pts.length-1]; return `<path d="${d}" fill="none" stroke="var(${strats[ki].c})" stroke-width="2.5" stroke-linejoin="round"/><circle cx="${X(pts.length-1)}" cy="${Y(last)}" r="3.5" fill="var(${strats[ki].c})"/>`; }).join('');
+    svg.innerHTML = grid + xt + lines;
   }
 
-  const tb = document.getElementById('rows');
-  tb.innerHTML = picks.length ? dates.map(d=>{
-    const day = picks.filter(p=>p.date===d).sort((a,b)=>(a.rank||99)-(b.rank||99));
-    const dayPL = day.reduce((s,p)=>s+pl(p,stake),0);
-    const anySettled = day.some(p=>p.result==='won'||p.result==='lost');
-    return `<tr class="day"><td colspan="6">${esc(fmtDate(d))}</td><td class="num ${dayPL>0?'pos':dayPL<0?'neg':''}">${anySettled?fmtMoney(dayPL):''}</td></tr>` +
-      day.map(p=>{ const v=pl(p,stake), s=p.result==='won'||p.result==='lost';
+  // record tiles
+  const settled = R.picks.filter(p=>settledRes(p.result));
+  document.getElementById('sPicks').textContent = settled.length;
+  document.getElementById('sHit').textContent = settled.length ? Math.round(R.s1.won/settled.length*100)+'%' : '–';
+  document.getElementById('sTop').textContent = R.tops.length ? `${R.tops.filter(p=>p.result==='won').length}/${R.tops.length}` : '–';
+  const bd=document.getElementById('sBest'); bd.textContent = R.bestDay ? fmtSigned(R.bestDay.pl) : '–'; bd.className = R.bestDay?cls(R.bestDay.pl):'';
+
+  // insights
+  const anyBand = R.bands.some(b=>b.n);
+  document.getElementById('calib').innerHTML = anyBand ? `<table class="mini"><thead><tr><th>Confidence</th><th class="num">Bets</th><th class="num">Predicted</th><th class="num">Landed</th><th style="width:40%"></th></tr></thead><tbody>${
+    R.bands.filter(b=>b.n).map(b=>`<tr><td>${b.label}</td><td class="num">${b.n}</td><td class="num">${pct(b.predicted)}</td><td class="num ${b.actual>=b.predicted?'pos':'neg'}">${pct(b.actual)}</td>
+      <td><div class="cal"><div class="calbar"><i style="width:${Math.min(100,b.actual)}%"></i><em style="left:calc(${Math.min(100,b.predicted)}% - 1px)"></em></div></div></td></tr>`).join('')}</tbody></table>`
+    : '<div class="empty">Fills in as bets settle. After a few weeks this shows whether to trust the confidence numbers.</div>';
+  const grpTable = rows => rows.length ? `<table class="mini"><thead><tr><th></th><th class="num">Bets</th><th class="num">Hit</th><th class="num">P/L</th></tr></thead><tbody>${
+    rows.map(r=>`<tr><td>${esc(r.k)}</td><td class="num">${r.n}</td><td class="num">${pct(r.hit)}</td><td class="num ${cls(r.pl)}">${fmtSigned(r.pl)}</td></tr>`).join('')}</tbody></table>` : '<div class="empty">No settled bets yet.</div>';
+  document.getElementById('bySport').innerHTML = grpTable(R.bySport);
+  document.getElementById('byType').innerHTML = grpTable(R.byType);
+
+  // ledger
+  const tb=document.getElementById('rows'), dd=[...R.dates].reverse();
+  tb.innerHTML = R.picks.length ? dd.map(d=>{
+    const day=R.picks.filter(p=>p.date===d).sort((a,b)=>(a.rank||99)-(b.rank||99));
+    const pl=day.reduce((s,p)=>s+singlePL(p,stake),0), any=day.some(p=>settledRes(p.result));
+    return `<tr class="day"><td colspan="6">${esc(fmtDate(d))}</td><td class="num ${cls(pl)}">${any?fmtSigned(pl):''}</td></tr>` +
+      day.map(p=>{ const v=singlePL(p,stake);
         return `<tr><td>${esc(p.rank)}</td><td class="sel2"><strong>${esc(p.selection)}</strong><br><span class="sub">${esc(p.event)}</span></td>
-          <td><span class="tag ${isLay(p)?'lay':'back'}">${betLabel(p)}</span></td>
+          <td><span class="tag ${isLay(p)?'lay':'back'}">${isLay(p)?'Lay':'Back'}</span></td>
           <td class="num">${Number(p.odds).toFixed(2)}</td><td class="num">${esc(p.confidence)}%</td>
           <td><span class="pill ${esc(p.result)}">${esc(p.result)}</span></td>
-          <td class="num ${v>0?'pos':v<0?'neg':''}">${s?fmtMoney(v):'–'}</td></tr>`; }).join('');
+          <td class="num ${cls(v)}">${settledRes(p.result)?fmtSigned(v):'–'}</td></tr>`; }).join('');
   }).join('') : '<tr><td colspan="7" class="empty">No picks yet.</td></tr>';
 }
 
