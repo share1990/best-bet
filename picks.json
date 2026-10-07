@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-07T14:40:00+01:00",
+ "updated": "2026-10-07T14:55:00+01:00",
  "stake": 10,
  "window": {
   "from": "2026-10-07T12:00:00+01:00",
@@ -145,6 +145,28 @@
    "confidence": 55,
    "reason": "Road favourites; exchange 1.79 sits above the lowest bookmaker price of 1.73.",
    "result": "pending"
+  }
+ ],
+ "accas": [
+  {
+   "date": "2026-10-07",
+   "name": "Treble",
+   "legs": [
+    2,
+    3,
+    4
+   ]
+  },
+  {
+   "date": "2026-10-07",
+   "name": "5-fold",
+   "legs": [
+    2,
+    3,
+    4,
+    5,
+    6
+   ]
   }
  ]
 }

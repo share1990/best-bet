@@ -76,6 +76,19 @@ td.num,th.num{text-align:right}
 tr.day td{background:var(--bg);font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:.8rem;color:var(--muted)}
 tr:last-child td{border-bottom:0}
 .empty{color:var(--muted);padding:18px;text-align:center}
+.accas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:540px){.accas{grid-template-columns:1fr}}
+.acca{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.acca-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.acca-name{font-family:var(--display);font-weight:700;font-size:1.3rem;text-transform:uppercase;letter-spacing:.03em}
+.acca ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:.9rem}
+.acca li{display:flex;justify-content:space-between;gap:10px}
+.acca li span:first-child{min-width:0}
+.acca li .num{font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.acca-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px}
+.leg-won{color:var(--win)} .leg-lost{color:var(--loss);text-decoration:line-through}
+.statline{margin-top:10px;font-size:.88rem;color:var(--muted)}
+.statline b{color:var(--ink);font-variant-numeric:tabular-nums}
 details{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:.88rem}
 summary{cursor:pointer;font-weight:600}
 summary:focus-visible{outline:2px solid var(--back-ink);outline-offset:2px}
@@ -96,10 +109,16 @@ footer{color:var(--muted);font-size:.78rem}
     <ol class="slate" id="slate"><li class="empty">Loading today's picks…</li></ol>
   </section>
 
+  <section>
+    <h2>Today's accumulators</h2>
+    <div class="accas" id="accas"><div class="acca"><span class="sub">Loading…</span></div></div>
+  </section>
+
   <details>
     <summary>How back and lay bets are scored</summary>
     <p><strong>Back</strong> means betting the selection will win. A £10 back bet at 1.60 returns £6 profit if it wins and loses £10 if it doesn't.</p>
     <p><strong>Lay</strong> means betting the selection will <em>not</em> win, on the exchange. A £10 lay at 4.80 wins £10 if the selection fails to win, and loses £38 (10 × 3.80) if it wins. Lays win more often but cost more when they lose.</p>
+    <p><strong>Accumulators</strong> combine the day's top back picks into one bet. Every leg must win. The odds multiply together, and so do the chances, so a treble of 65% picks lands only about a quarter of the time. A void leg drops out and the rest still count. Place accas with a bookmaker, as the exchange doesn't offer them, so expect slightly lower odds than shown.</p>
   </details>
 
   <section>
@@ -110,6 +129,7 @@ footer{color:var(--muted);font-size:.78rem}
       <div class="stat"><b id="sProfit">–</b><span>Profit</span></div>
       <div class="stat"><b id="sTop">–</b><span>No.1 picks hit</span></div>
     </div>
+    <p class="statline" id="accaRecord">Accumulators: no settled accas yet.</p>
   </section>
 
   <section>
@@ -166,6 +186,34 @@ function render(data){
       <div class="why">${esc(p.reason)}</div>
       <div class="meta"><span>${esc(fmtStart(p.start))}</span><span>·</span><span>${esc(p.confidence)}% confidence</span><span class="pill ${esc(p.result)}">${esc(p.result)}</span></div>
     </li>`).join('') : '<li class="empty">No picks yet. The first slate appears at 12:00.</li>';
+
+  // accumulators: legs reference that day's ranks; odds, chance and result are derived from the legs
+  const accaEval = a => {
+    const legs = (a.legs||[]).map(r=>picks.find(p=>p.date===a.date && p.rank===r)).filter(Boolean);
+    const live = legs.filter(l=>l.result!=='void');
+    const odds = live.reduce((m,l)=>m*l.odds,1);
+    const chance = live.reduce((m,l)=>m*(l.confidence/100),1);
+    let result='pending';
+    if(legs.length && legs.every(l=>l.result==='void')) result='void';
+    else if(legs.some(l=>l.result==='lost')) result='lost';
+    else if(legs.length && legs.every(l=>l.result==='won'||l.result==='void')) result='won';
+    const pnl = result==='won' ? stake*(odds-1) : result==='lost' ? -stake : 0;
+    return {legs, odds, chance, result, pnl};
+  };
+  const accas = data.accas||[];
+  const todayAccas = accas.filter(a=>a.date===today).sort((a,b)=>(a.legs||[]).length-(b.legs||[]).length);
+  document.getElementById('accas').innerHTML = todayAccas.length ? todayAccas.map(a=>{
+    const e=accaEval(a);
+    return `<div class="acca">
+      <div class="acca-head"><span class="acca-name">${esc(a.name||((a.legs||[]).length+'-fold'))}</span><div class="chip back" style="grid-row:auto;grid-column:auto"><span>Odds</span><b>${e.odds.toFixed(2)}</b></div></div>
+      <ul>${e.legs.map(l=>`<li><span class="${l.result==='won'?'leg-won':l.result==='lost'?'leg-lost':''}">#${esc(l.rank)} ${esc(l.selection)}</span><span class="num">${Number(l.odds).toFixed(2)}</span></li>`).join('')}</ul>
+      <div class="acca-foot"><span>About ${Math.round(e.chance*100)}% chance · £${stake} returns £${(stake*e.odds).toFixed(2)}</span><span class="pill ${e.result}">${e.result}</span></div>
+    </div>`;}).join('') : '<div class="acca"><span class="sub">No accumulators today.</span></div>';
+  const accaSettled = accas.map(accaEval).filter(e=>e.result==='won'||e.result==='lost');
+  if(accaSettled.length){
+    const aw=accaSettled.filter(e=>e.result==='won').length, ap=accaSettled.reduce((s,e)=>s+e.pnl,0);
+    document.getElementById('accaRecord').innerHTML = `Accumulators: <b>${aw}/${accaSettled.length}</b> landed · profit <b class="${ap>0?'pos':ap<0?'neg':''}">${fmtMoney(ap)}</b> at £${stake} each`;
+  }
 
   const settled = picks.filter(p=>p.result==='won'||p.result==='lost').sort((a,b)=> (a.date+String(a.start)) < (b.date+String(b.start)) ? -1 : 1);
   const wins = settled.filter(p=>p.result==='won').length;
