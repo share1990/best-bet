@@ -215,7 +215,7 @@ footer{color:var(--muted);font-size:.78rem}
     </div>
   </section>
 
-  <footer>Ten ranked picks plus two accumulators, posted by 12:00 UK time, covering events from noon until 11:59 the next morning. Odds are Betfair Exchange prices where available. For fun among friends, not advice. Please gamble responsibly.</footer>
+  <footer>Ten ranked picks, two accumulators and a horse racing wild card, posted by 9:30am UK time, covering events from 9:30am until 9:29am the next morning. Check the live price before betting. Odds are Betfair Exchange prices where available. For fun among friends, not advice. Please gamble responsibly.</footer>
 </div>
 
 <script>
@@ -347,7 +347,7 @@ function render(data){
       <div class="ev">${esc(p.event)} · ${esc(p.sport)}</div>
       <div class="why">${esc(p.reason)}</div>
       <div class="meta"><span>${esc(fmtStart(p.start))}</span><span>·</span><span>${esc(p.confidence)}% confidence</span><span class="pill ${esc(p.result)}">${esc(p.result)}</span></div>
-    </li>`).join('') : '<li class="empty">No picks yet. The first slate appears at 12:00.</li>';
+    </li>`).join('') : '<li class="empty">No picks yet. The first slate appears at 9:30am.</li>';
 
   // accas
   const ta = R.accas.filter(a=>a.date===today).sort((a,b)=>a.legs.length-b.legs.length);
