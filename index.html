@@ -14,19 +14,19 @@
   --bg:#eef1f4; --surface:#ffffff; --ink:#16202b; --muted:#5d6b7a; --line:#d5dce4;
   --back:#a6d8ff; --back-ink:#0b3b63; --lay:#fac9d4; --lay-ink:#6b1428;
   --win:#13795b; --win-bg:#dcf2e8; --loss:#b3263a; --loss-bg:#fbe1e5; --pend:#8a5a00; --pend-bg:#fdf0d2;
-  --s1:#1f6fb2; --s2:#c2571a; --s3:#7a4bb8; --s4:#13795b; --s5:#a87a00; --gold:#8a6400; --gold-bg:#fbf1d4;
+  --s1:#1f6fb2; --s2:#c2571a; --s3:#7a4bb8; --s4:#13795b; --s5:#a87a00; --s6:#0e7c86; --val:#0e6b73; --val-bg:#d8f1f2; --gold:#8a6400; --gold-bg:#fbf1d4;
   --display:"Barlow Condensed","Arial Narrow",sans-serif; --body:"Barlow",system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0f151c; --surface:#18212b; --ink:#e6ecf2; --muted:#93a1b0; --line:#2b3744;
   --back:#2a5f8a; --back-ink:#e3f2ff; --lay:#7a3a49; --lay-ink:#ffe3ea;
   --win:#5fd3a6; --win-bg:#173a2f; --loss:#ff8a9a; --loss-bg:#43202a; --pend:#f3c46a; --pend-bg:#3d3018;
-  --s1:#6cb4f0; --s2:#f2995e; --s3:#b99af0; --s4:#5fd3a6; --s5:#e8c158; --gold:#f0cf6e; --gold-bg:#3a3016; color-scheme:dark}}
+  --s1:#6cb4f0; --s2:#f2995e; --s3:#b99af0; --s4:#5fd3a6; --s5:#e8c158; --s6:#4fd1d9; --val:#7fe0e6; --val-bg:#163a3d; --gold:#f0cf6e; --gold-bg:#3a3016; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0f151c; --surface:#18212b; --ink:#e6ecf2; --muted:#93a1b0; --line:#2b3744;
   --back:#2a5f8a; --back-ink:#e3f2ff; --lay:#7a3a49; --lay-ink:#ffe3ea;
   --win:#5fd3a6; --win-bg:#173a2f; --loss:#ff8a9a; --loss-bg:#43202a; --pend:#f3c46a; --pend-bg:#3d3018;
-  --s1:#6cb4f0; --s2:#f2995e; --s3:#b99af0; --s4:#5fd3a6; --s5:#e8c158; --gold:#f0cf6e; --gold-bg:#3a3016; color-scheme:dark}
+  --s1:#6cb4f0; --s2:#f2995e; --s3:#b99af0; --s4:#5fd3a6; --s5:#e8c158; --s6:#4fd1d9; --val:#7fe0e6; --val-bg:#163a3d; --gold:#f0cf6e; --gold-bg:#3a3016; color-scheme:dark}
 *{box-sizing:border-box}
 html{color-scheme:light}
 body{margin:0}
@@ -138,6 +138,16 @@ table.ledger{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-n
 .pick.r-won{box-shadow:inset 5px 0 0 var(--win);background:linear-gradient(90deg,var(--win-bg),transparent 60%)}
 .pick.r-lost{box-shadow:inset 5px 0 0 var(--loss);background:linear-gradient(90deg,var(--loss-bg),transparent 60%)}
 .recent{display:flex;flex-direction:column;gap:10px}
+.chip.val{background:var(--val-bg);color:var(--val)}
+.tag.val{background:var(--val-bg);color:var(--val)}
+.rc.v{border-style:dashed}
+.edge{font-family:var(--display);font-weight:700;color:var(--val);font-variant-numeric:tabular-nums}
+.alert{grid-column:2/4;font-size:.85rem;padding:6px 8px;border-radius:6px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.alert b{font-family:var(--display);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.75rem}
+.alert.ok{background:var(--win-bg);color:var(--win)}
+.alert.caution{background:var(--pend-bg);color:var(--pend)}
+.alert.avoid{background:var(--loss-bg);color:var(--loss)}
+.alert span{color:var(--ink)}
 .rday{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
 .rday-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
 .rday-head b{font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:.9rem}
@@ -172,6 +182,12 @@ footer{color:var(--muted);font-size:.78rem}
   <section>
     <h2>Today's accumulators</h2>
     <div class="accas" id="accas"><div class="acca"><span class="sub">Loading…</span></div></div>
+  </section>
+
+  <section>
+    <h2>Value bets · bookmaker prices beating the exchange</h2>
+    <p class="window">Ranked by edge: how far the bookmaker's price beats Betfair's exchange price. These lose more often than the top 10; the profit comes from the price.</p>
+    <ol class="slate" id="value"><li class="empty">Loading…</li></ol>
   </section>
 
   <section>
@@ -228,6 +244,8 @@ footer{color:var(--muted);font-size:.78rem}
     <p><strong>Lay</strong> means betting the selection will <em>not</em> win, on the exchange. A £5 lay at 4.80 wins £5 if the selection fails to win and loses £19 (5 × 3.80) if it wins.</p>
     <p><strong>Accumulators</strong> combine the day's top back picks. Every leg must win, so the chances multiply down quickly. A void leg drops out. Accas are placed with a bookmaker, so real odds will be a little lower than shown.</p>
     <p><strong>The wild card</strong> is one bigger-priced horse a day from racing anywhere in the world, backed £5 each-way (£10 in total). Half wins if it wins; the other half pays a fraction of the odds (usually a quarter or a fifth) if it finishes in the places. So a 14/1 shot placing still turns a profit, and a winner pays big. Expect plenty of losing days between hits.</p>
+    <p><strong>Value bets</strong> are backed with the named bookmaker where its price is higher than Betfair's exchange price, which is usually the sharpest guide to the true chance. The edge is how much better the bookmaker's price is. Each is tracked at £5. Bookmakers correct these prices quickly, so check the price is still there before betting.</p>
+    <p><strong>Evening update:</strong> around 6:45pm the picks still to start are re-checked for team news and price moves. A green, amber or red note shows on each one. Results are still scored at the morning price, so the record stays honest.</p>
     <p><strong>The No.1 bank</strong> starts with £10 and puts the whole bank on each day's No.1 pick (for a lay, the bank is the amount at risk). Winnings roll into the next day. If a pick loses, the bank is gone; a fresh £10 goes in the next day and the tracker counts how much has been put in overall.</p>
     <p>All profit is before exchange commission (usually 2–5% of winnings).</p>
   </details>
@@ -274,12 +292,14 @@ function wildPL(w, stake){
   return 0;
 }
 const wildSettled = r => r==='won'||r==='placed'||r==='lost';
+const valuePL = (v, stake) => v.result==='won' ? stake*(v.odds-1) : v.result==='lost' ? -stake : 0;
 function compute(data){
   const stake = data.stake || 5;
   const bankStart = data.bankStart || 10;
   const picks = data.picks || [];
   const accas = (data.accas || []).map(a=>accaEval(a,picks,stake));
-  const dates = [...new Set([...picks.map(p=>p.date), ...(data.wildcards||[]).map(w=>w.date)])].sort();
+  const values = data.value || [];
+  const dates = [...new Set([...picks.map(p=>p.date), ...(data.wildcards||[]).map(w=>w.date), ...values.map(v=>v.date)])].sort();
 
   // strategy 1: every single at flat stake
   const singles = picks.filter(p=>settledRes(p.result));
@@ -297,6 +317,11 @@ function compute(data){
               won: ws.filter(w=>w.result==='won').length, placed: ws.filter(w=>w.result==='placed').length,
               best: ws.filter(w=>w.result==='won').reduce((m,w)=>Math.max(m,w.odds),0)};
 
+  // strategy 6: value bets at flat stake
+  const vs = values.filter(v=>settledRes(v.result));
+  const s6 = {pl: vs.reduce((s,v)=>s+valuePL(v,stake),0), staked: vs.length*stake, n: vs.length, won: vs.filter(v=>v.result==='won').length,
+              avgEdge: vs.length ? vs.reduce((s,v)=>s+(v.edge||0),0)/vs.length : 0};
+
   // strategy 4: rolling No.1 bank, whole bank each day, restart with fresh money after a bust
   let bank=bankStart, invested=bankStart, restarts=0, peak=bankStart, needRestart=false, alive=0, bestRun=0, run=0;
   const bankByDate = {};
@@ -313,11 +338,11 @@ function compute(data){
   const s4 = {bank, invested, restarts, peak, bestRun, net: bank-invested, bust: needRestart};
 
   // running series by date (cumulative, settled only)
-  const series = {s1:[0], s2:[0], s3:[0], s4:[0], s5:[0]}, labels=['Start'];
-  let c1=0,c2=0,c3=0,c5=0;
+  const series = {s1:[0], s2:[0], s3:[0], s4:[0], s5:[0], s6:[0]}, labels=['Start'];
+  let c1=0,c2=0,c3=0,c5=0,c6=0;
   for(const d of dates){
     const day = picks.filter(p=>p.date===d);
-    const any = day.some(p=>settledRes(p.result)) || accas.some(a=>a.date===d && settledRes(a.result)) || wilds.some(w=>w.date===d && wildSettled(w.result));
+    const any = day.some(p=>settledRes(p.result)) || accas.some(a=>a.date===d && settledRes(a.result)) || wilds.some(w=>w.date===d && wildSettled(w.result)) || values.some(v=>v.date===d && settledRes(v.result));
     if(!any) continue;
     c1 += day.reduce((s,p)=>s+singlePL(p,stake),0);
     c2 += accas.filter(a=>a.date===d && a.name==='Treble').reduce((s,a)=>s+a.pnl,0);
@@ -325,6 +350,7 @@ function compute(data){
     series.s1.push(c1); series.s2.push(c2); series.s3.push(c3);
     series.s4.push(bankByDate[d].bank - bankByDate[d].invested);
     c5 += wilds.filter(w=>w.date===d).reduce((s,w)=>s+wildPL(w,stake),0); series.s5.push(c5);
+    c6 += values.filter(v=>v.date===d).reduce((s,v)=>s+valuePL(v,stake),0); series.s6.push(c6);
     labels.push(d);
   }
 
@@ -341,7 +367,7 @@ function compute(data){
   const groupBy = key => { const m={}; for(const p of singles){ const k=key(p); (m[k]=m[k]||[]).push(p);}
     return Object.entries(m).map(([k,xs])=>({k, n:xs.length, hit: xs.filter(p=>p.result==='won').length/xs.length*100, pl: xs.reduce((s,p)=>s+singlePL(p,stake),0)})).sort((a,b)=>b.pl-a.pl); };
 
-  return {stake, bankStart, picks, accas, wilds, dates, s1, s2, s3, s4, s5, series, labels, bestDay, tops, bands,
+  return {stake, bankStart, picks, accas, wilds, values, dates, s1, s2, s3, s4, s5, s6, series, labels, bestDay, tops, bands,
           bySport: groupBy(p=>p.sport||'Other'), byType: groupBy(p=>isLay(p)?'Lay':'Back')};
 }
 /* ===== end calculations ===== */
@@ -354,6 +380,8 @@ const ukTime = (iso,opts) => { try { return new Date(iso).toLocaleString('en-GB'
 const fmtStart = iso => ukTime(iso,{weekday:'short',hour:'2-digit',minute:'2-digit'}) + ' UK';
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const pct = v => v==null ? '–' : Math.round(v)+'%';
+const alertHtml = a => { if(!a||!a.flag) return ''; const lbl={ok:'Still good',caution:'Caution',avoid:'Avoid'}[a.flag]||a.flag;
+  return `<div class="alert ${esc(a.flag)}"><b>${esc(lbl)}</b><span>${esc(a.note||'')}${a.nowOdds?` Now ${Number(a.nowOdds).toFixed(2)}.`:''}</span></div>`; };
 const roi = (pl,staked) => staked ? Math.round(pl/staked*100)+'% return' : 'no settled bets yet';
 
 function render(data){
@@ -374,7 +402,21 @@ function render(data){
       <div class="ev">${esc(p.event)} · ${esc(p.sport)}</div>
       <div class="why">${esc(p.reason)}</div>
       <div class="meta"><span>${esc(fmtStart(p.start))}</span><span>·</span><span>${esc(p.confidence)}% confidence</span><span class="pill ${esc(p.result)}">${esc(p.result)}</span></div>
+      ${p.result==='pending'?alertHtml(p.alert):''}
     </li>`).join('') : '<li class="empty">No picks yet. The first slate appears at 9:30am.</li>';
+
+  // value bets
+  const tv = R.values.filter(v=>v.date===today).sort((a,b)=>(a.rank||99)-(b.rank||99));
+  document.getElementById('value').innerHTML = tv.length ? tv.map(v=>`
+    <li class="pick${settledRes(v.result)?' r-'+v.result:''}">
+      <div class="rank">${esc(v.rank)}</div>
+      <div class="who">${esc(v.selection)}</div>
+      <div class="chip val"><span>${esc(v.bookmaker)}</span><b>${Number(v.odds).toFixed(2)}</b></div>
+      <div class="ev">${esc(v.event)} · ${esc(v.sport)}</div>
+      <div class="why"><span class="edge">+${Number(v.edge).toFixed(1)}% edge</span> · exchange price ${Number(v.fair).toFixed(2)} · ${esc(v.reason)}</div>
+      <div class="meta"><span>${esc(fmtStart(v.start))}</span><span>·</span><span>about ${esc(v.confidence)}% to win</span><span class="pill ${esc(v.result)}">${esc(v.result)}</span></div>
+      ${v.result==='pending'?alertHtml(v.alert):''}
+    </li>`).join('') : '<li class="empty">No value bets today. They start with the next 9:30am update.</li>';
 
   // recent results: previous 5 days as green/red chips
   const past = R.dates.filter(d=>d!==today).slice(-5).reverse();
@@ -385,7 +427,7 @@ function render(data){
     const pl=day.reduce((s,p)=>s+singlePL(p,stake),0);
     const acc=R.accas.filter(a=>a.date===d).map(a=>`${a.name} ${a.result==='won'?'✓':a.result==='lost'?'✗':'…'}`).join(' · ');
     return `<div class="rday"><div class="rday-head"><b>${esc(fmtDate(d))}</b><span>${won}/${st.length} won · <span class="${cls(pl)}">${st.length?fmtSigned(pl):'–'}</span>${acc?' · '+esc(acc):''}</span></div>
-      <div class="chips">${day.map(p=>`<span class="rc ${esc(p.result)}" title="${esc(p.event)}"><i>${esc(p.rank)}</i>${isLay(p)?'Lay ':''}${esc(p.selection)} ${Number(p.odds).toFixed(2)}</span>`).join('')}${wc.map(w=>`<span class="rc ${esc(w.result)}" title="${esc(w.event)}"><i>WC</i>${esc(w.selection)} ${Number(w.odds).toFixed(2)}</span>`).join('')}</div></div>`;
+      <div class="chips">${day.map(p=>`<span class="rc ${esc(p.result)}" title="${esc(p.event)}"><i>${esc(p.rank)}</i>${isLay(p)?'Lay ':''}${esc(p.selection)} ${Number(p.odds).toFixed(2)}</span>`).join('')}${wc.map(w=>`<span class="rc ${esc(w.result)}" title="${esc(w.event)}"><i>WC</i>${esc(w.selection)} ${Number(w.odds).toFixed(2)}</span>`).join('')}${R.values.filter(v=>v.date===d).sort((a,b)=>a.rank-b.rank).map(v=>`<span class="rc v ${esc(v.result)}" title="${esc(v.event)} · ${esc(v.bookmaker)}"><i>V${esc(v.rank)}</i>${esc(v.selection)} ${Number(v.odds).toFixed(2)}</span>`).join('')}</div></div>`;
   }).join('') : '<div class="rday"><span class="sub">Results from previous days will show here.</span></div>';
 
   // accas
@@ -422,12 +464,14 @@ function render(data){
       detail: `${s4.bust?'Bust, fresh £'+R.bankStart+' goes in next pick · ':''}£${s4.invested} put in · net ${fmtSigned(s4.net)} · peak ${fmtMoney(s4.peak)} · best run ${s4.bestRun} win${s4.bestRun===1?'':'s'}${s4.restarts?` · ${s4.restarts} restart${s4.restarts===1?'':'s'}`:''}`}
     ,{c:'--s5', label:`Wild card at £${stake} e/w a day`, big:R.s5.n?fmtSigned(R.s5.pl):'£0.00', v:R.s5.pl,
       detail: R.s5.n ? `${R.s5.won} won, ${R.s5.placed} placed of ${R.s5.n} · £${R.s5.staked} staked · ${roi(R.s5.pl,R.s5.staked)}${R.s5.best?` · best winner ${R.s5.best.toFixed(2)}`:''}` : 'Waiting for the first wild card to run'}
+    ,{c:'--s6', label:`Value bets at £${stake} each`, big:R.s6.n?fmtSigned(R.s6.pl):'£0.00', v:R.s6.pl,
+      detail: R.s6.n ? `${R.s6.won}/${R.s6.n} won · £${R.s6.staked} staked · ${roi(R.s6.pl,R.s6.staked)} · average edge ${R.s6.avgEdge.toFixed(1)}%` : 'Trial started 14 Oct · waiting for the first results'}
   ];
   document.getElementById('strats').innerHTML = strats.map(s=>`<div class="strat" style="--c:var(${s.c})">
       <span class="label">${esc(s.label)}</span><span class="big ${cls(s.v)}">${esc(s.big)}</span><span class="detail">${esc(s.detail)}</span></div>`).join('');
 
   // chart
-  const svg=document.getElementById('chart'), L=R.labels, keys=['s1','s2','s3','s4','s5'];
+  const svg=document.getElementById('chart'), L=R.labels, keys=['s1','s2','s3','s4','s5','s6'];
   document.getElementById('legend').innerHTML = strats.map(s=>`<span><i style="--c:var(${s.c})"></i>${esc(s.label)}</span>`).join('');
   if(L.length<2){ svg.innerHTML='<text x="320" y="114" text-anchor="middle" fill="var(--muted)" font-size="14">The lines start once the first bets settle</text>'; }
   else {
@@ -476,7 +520,11 @@ function render(data){
       R.wilds.filter(w=>w.date===d).map(w=>{ const v=wildPL(w,stake);
         return `<tr class="${wildSettled(w.result)?'r-'+w.result:''}"><td>WC</td><td class="sel2"><strong>${esc(w.selection)}</strong><br><span class="sub">${esc(w.event)}</span></td>
           <td><span class="tag ew">E/W</span></td><td class="num">${Number(w.odds).toFixed(2)}</td><td class="num">${esc(w.winChance)}%</td>
-          <td><span class="pill ${esc(w.result)}">${esc(w.result)}</span></td><td class="num ${cls(v)}">${wildSettled(w.result)?fmtSigned(v):'–'}</td></tr>`; }).join('');
+          <td><span class="pill ${esc(w.result)}">${esc(w.result)}</span></td><td class="num ${cls(v)}">${wildSettled(w.result)?fmtSigned(v):'–'}</td></tr>`; }).join('') +
+      R.values.filter(x=>x.date===d).sort((a,b)=>a.rank-b.rank).map(x=>{ const v=valuePL(x,stake);
+        return `<tr class="${settledRes(x.result)?'r-'+x.result:''}"><td>V${esc(x.rank)}</td><td class="sel2"><strong>${esc(x.selection)}</strong><br><span class="sub">${esc(x.event)} · ${esc(x.bookmaker)}</span></td>
+          <td><span class="tag val">Value</span></td><td class="num">${Number(x.odds).toFixed(2)}</td><td class="num">${esc(x.confidence)}%</td>
+          <td><span class="pill ${esc(x.result)}">${esc(x.result)}</span></td><td class="num ${cls(v)}">${settledRes(x.result)?fmtSigned(v):'–'}</td></tr>`; }).join('');
   }).join('') : '<tr><td colspan="7" class="empty">No picks yet.</td></tr>';
 }
 
